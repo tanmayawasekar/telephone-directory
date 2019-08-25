@@ -1,0 +1,64 @@
+version: '3'
+services:
+  nginx: 
+    image: nginx:latest
+    container_name: production_nginx_telephone
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 8080:8080
+      - 443:443
+    external_links:
+      - telephone
+      - test-pgadmin-compose
+    depends_on:
+      - telephone
+      - test-pgadmin-compose
+    networks :
+      - postgres-compose-network
+
+  telephone:
+    build: .
+    container_name: telephone
+    expose:
+      - "3000"
+    external_links:
+      - test-postgres-compose
+    volumes:
+      - ./:/usr/src/app
+    depends_on :
+      - test-pgadmin-compose
+    networks :
+      - postgres-compose-network
+
+  test-postgres-compose:
+    image : postgres
+    # environment :
+    #   POSTGRES_PASSWORD : "Postgres2019!"
+    ports :
+      - "15432:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    networks :
+      - postgres-compose-network
+
+  test-pgadmin-compose :
+    image : dpage/pgadmin4
+    environment :
+      PGADMIN_DEFAULT_EMAIL : "renatogroff@yahoo.com.br"
+      PGADMIN_DEFAULT_PASSWORD : "PgAdmin2019!"
+    ports :
+      - "16543:80"
+    depends_on :
+      - test-postgres-compose
+    networks :
+      - postgres-compose-network
+
+
+networks :
+  postgres-compose-network :
+    driver : bridge    
+
+volumes:
+  database_data:
+    driver: local
