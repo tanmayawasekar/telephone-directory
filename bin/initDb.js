@@ -14,6 +14,5 @@ sequelize.query("CREATE DATABASE telephone_derectory;").then(data => {
     console.log("DataBase Created of name telephone-derectory");
     process.emit("DatabaseCreated");
 }).catch(error => {
-    console.log(error)
     process.emit("DatabaseCreated");
 });
